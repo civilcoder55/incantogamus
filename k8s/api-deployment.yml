@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-pod
+  template:
+    metadata:
+      name: api-pod
+      labels:
+        app: api-pod
+    spec:
+      containers:
+        - name: incantogamus-node
+          image: incantogamus-node
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 100m
+          imagePullPolicy: Never
+          command: ["/app/run.sh"]
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NODE_ENV
+              value: "production"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: JWT_SECRET
+            - name: JWT_ACCESS_EXPIRATION_MINUTES
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: JWT_ACCESS_EXPIRATION_MINUTES
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: REDIS_PORT
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: MYSQL_HOST
+            - name: MYSQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: MYSQL_PORT
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: MYSQL_USERNAME
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-credentials
+                  key: MYSQL_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: api-pod
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
