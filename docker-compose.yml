@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  node-app:
+    build: .
+    image: incantogamus-node
+    container_name: incantogamus-node
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    networks:
+      - app-network
+    env_file:
+      - .env
+    entrypoint: /app/run.sh
+
+  mysql:
+    image: mysql:latest
+    container_name: incantogamus-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: 'incantogamus'
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: incantogamus-redis
+    volumes:
+      - redis-data:/data/redis
+    ports:
+      - '6379:6379'
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+  redis-data:
+  node_modules:
+networks:
+  app-network:
