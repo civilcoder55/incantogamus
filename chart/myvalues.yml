@@ -1,0 +1,46 @@
+app:
+  name: api
+  replicas: 1
+  image:
+    repository: incantogamus-node
+    pullPolicy: Never
+    tag: "latest"
+    port: 3000
+    command: ["/app/run.sh"]
+  environment:
+    - name: NODE_ENV
+      value: "production"
+    - name: JWT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: app-credentials
+          key: JWT_SECRET
+    - name: JWT_ACCESS_EXPIRATION_MINUTES
+      valueFrom:
+        secretKeyRef:
+          name: app-credentials
+          key: JWT_ACCESS_EXPIRATION_MINUTES
+          
+mysql:
+  image:
+    repository: mysql
+    tag: latest
+  password:
+    fromSecret: true
+    value: "root"
+    secretName: app-credentials
+    secretKey: MYSQL_PASSWORD
+  database: "incantogamus"
+  extraEnvironment:
+    
+
+redis:
+  image:
+    repository: redis
+    tag: alpine
+  extraEnvironment:
+    
+
+ingress:
+  enabled: true
+  host: "incantogamus.com"

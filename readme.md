@@ -110,3 +110,68 @@
    ```sh
    http://incantogamus.com/health
    ```
+
+## Deploy to kubernetes (miniKube) using Helm Chart
+
+1. Clone the repo
+
+   ```sh
+   git clone `https://github.com/civilcoder55/incantogamus.git`
+   ```
+
+2. Change directory
+
+   ```sh
+   cd incantogamus
+   ```
+
+3. build the image
+
+   ```sh
+   eval $(minikube docker-env) # to use local docker image in minikube
+   docker-compose build
+   ```
+
+4. update the chart/secrets.yaml and chart/myvalues.yml
+
+5. ensure run.sh is executable
+
+   ```sh
+   chmod +x run.sh
+   ```
+
+6. Apply only the secrets
+
+   ```sh
+   kubectl apply -f chart/secrets.yml
+   ```
+
+7. get the minikube node ip
+
+   ```sh
+   minikube ip
+   ```
+
+8. Add the ip to your hosts file
+
+   ```sh
+   echo "$(minikube ip) incantogamus.com" | sudo tee -a /etc/hosts
+   ```
+
+9. add the helm repo 
+
+   ```sh
+   helm repo add my-charts https://civilcoder55.github.io/learning-helm-charts
+   ```
+
+10. install the chart
+
+    ```sh
+    helm install incantogamus my-charts/express-mysql-redis
+    ```
+
+11. Test API at
+
+   ```sh
+   http://incantogamus.com/health
+   ```
